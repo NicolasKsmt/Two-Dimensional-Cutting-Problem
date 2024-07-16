@@ -95,13 +95,11 @@ def descida_randomica(itens, W, faixas, Wdf, cores):
     # Execução da busca local por descida randômica
     for _ in range(num_iteracoes):
         solucao_vizinha, Wdf_vizinha = gerar_vizinho(solucao_atual, Wdf_atual)
-        largura_valida = all(sum(item[1] for item in faixa) <= W for faixa in solucao_vizinha)
-        if largura_valida:
-            altura_vizinha = calcular_altura_total(solucao_vizinha)
-            if altura_vizinha < altura_atual:
-                solucao_atual = solucao_vizinha
-                Wdf_atual = Wdf_vizinha
-                altura_atual = altura_vizinha
+        altura_vizinha = calcular_altura_total(solucao_vizinha)
+        if altura_vizinha < altura_atual:
+            solucao_atual = solucao_vizinha
+            Wdf_atual = Wdf_vizinha
+            altura_atual = altura_vizinha
 
     # Resultado final
     print("Solução final:")
