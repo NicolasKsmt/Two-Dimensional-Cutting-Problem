@@ -124,11 +124,23 @@ def descida_randomica(itens, W, faixas, Wdf, cores):
     plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
 
+def gerador_de_instancias(n, H, W):
+    # Gera n itens com altura e largura aleatórias
+    itens = [(random.randint(1, H), random.randint(1, W)) for _ in range(n)]
+    return itens
+
 def main():
-    # Peças a serem alocadas no objeto maior
-    itens = [(2, 3), (1, 2), (3, 1), (2, 2), (1, 1), (3, 3), (5, 2)]  # (altura, largura)
-    W = 5  # largura do objeto
+    # Peças a serem alocadas na placa maior
+    # itens = [(2, 3), (1, 2), (3, 1), (2, 2), (1, 1), (3, 3), (5, 2)]  # (altura, largura)
+    W = 7  # largura da placa
+    n = (random.randint(5, 10))
+    itens = gerador_de_instancias(n, 10, W)
+    print("Lista de itens gerados:")
+    for item in itens:
+        print(f"Item: altura = {item[0]}, largura = {item[1]}")
+    print("\n==============================================\n")
     faixas, Wdf, cores = solucao_inicial(itens, W)
+    print("\n==============================================\n")
     descida_randomica(itens, W, faixas, Wdf, cores)
 
 main()
