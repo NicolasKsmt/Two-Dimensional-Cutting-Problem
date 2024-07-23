@@ -3,6 +3,7 @@ import numpy as np
 import random
 import math
 import os
+import time
 
 # Função para gerenciar o contador de execuções
 def contruir_contador(arquivo_contador):
@@ -18,6 +19,8 @@ def atualizar_contador(arquivo_contador, contador):
         arquivo.write(str(contador))
 
 def solucao_inicial(itens, W, arquivo):
+    start_time = time.time()
+
     largura_maxima_item = max(item[1] for item in itens)
     if W < largura_maxima_item:
         raise ValueError(f"A largura do objeto ({W}) é menor que a largura do item mais largo ({largura_maxima_item}).")
@@ -60,7 +63,13 @@ def solucao_inicial(itens, W, arquivo):
         altura_total += faixa[0][0]
     ax.set_xlim(0, W)
     ax.set_ylim(0, H)
+    ax.set_title("Solução Inicial")
     plt.show()
+
+    end_time = time.time()
+    execution_time = (end_time - start_time) * 1000  # Convertendo para milissegundos
+    arquivo.write(f"Temporizador: {execution_time:.2f} ms\n")
+
     return faixas, Wdf, cores
 
 def calcular_altura(faixas):
@@ -69,7 +78,7 @@ def calcular_altura(faixas):
 def calcular_largura(faixa):
     return sum(item[1] for item in faixa)
 
-def swap_itens(faixas, W):
+def trocar_itens(faixas, W):
     nova_faixa = [faixa[:] for faixa in faixas]
     faixa1, faixa2 = random.sample(range(len(nova_faixa)), 2)
 
@@ -100,6 +109,8 @@ def swap_itens(faixas, W):
     return [faixa[:] for faixa in faixas]
 
 def descida_randomica(W, faixas, cores, iteracoes, arquivo):
+    start_time = time.time()
+
     def calcular_altura(faixas):
         return sum(max(faixa, key=lambda x: x[0])[0] if faixa else 0 for faixa in faixas)
 
@@ -121,10 +132,11 @@ def descida_randomica(W, faixas, cores, iteracoes, arquivo):
 
         ax.set_xlim(0, W)
         ax.set_ylim(0, H)
+        ax.set_title("Descida Randômica")
         plt.show()
 
     def gerar_vizinho(faixas, W):
-        novo_faixas = swap_itens(faixas, W)
+        novo_faixas = trocar_itens(faixas, W)
         altura = calcular_altura(novo_faixas)
         return novo_faixas, altura
 
@@ -137,7 +149,7 @@ def descida_randomica(W, faixas, cores, iteracoes, arquivo):
             solucao_atual = solucao_vizinha
             altura_atual = altura_vizinha
 
-    arquivo.write("Solução final:\n")
+    arquivo.write("\n")
     for i, faixa in enumerate(solucao_atual):
         arquivo.write(f"Faixa {i+1}:\n")
         for item in faixa:
@@ -146,7 +158,13 @@ def descida_randomica(W, faixas, cores, iteracoes, arquivo):
 
     plotar_solucao(solucao_atual, W, cores)
 
+    end_time = time.time()
+    execution_time = (end_time - start_time) * 1000  # Convertendo para milissegundos
+    arquivo.write(f"Temporizador: {execution_time:.2f} ms\n")
+
 def simulated_annealing(W, faixas, cores, temp_inicial, temp_final, alfa, iteracoes, arquivo):
+    start_time = time.time()
+
     temp = temp_inicial
     atual_faixas = faixas
     atual_altura = calcular_altura(atual_faixas)
@@ -171,11 +189,12 @@ def simulated_annealing(W, faixas, cores, temp_inicial, temp_final, alfa, iterac
 
         ax.set_xlim(0, W)
         ax.set_ylim(0, H)
+        ax.set_title("Simulated Annealing")
         plt.show()
 
     while temp > temp_final:
         for _ in range(iteracoes):
-            nova_faixas = swap_itens(atual_faixas, W)
+            nova_faixas = trocar_itens(atual_faixas, W)
             nova_altura = calcular_altura(nova_faixas)
             delta = nova_altura - atual_altura
 
@@ -191,7 +210,7 @@ def simulated_annealing(W, faixas, cores, temp_inicial, temp_final, alfa, iterac
 
         temp *= alfa
 
-    arquivo.write("Solução final:\n")
+    arquivo.write("\n")
     for i, faixa in enumerate(melhor_faixas):
         arquivo.write(f"Faixa {i+1}:\n")
         for item in faixa:
@@ -199,17 +218,21 @@ def simulated_annealing(W, faixas, cores, temp_inicial, temp_final, alfa, iterac
     arquivo.write(f"Altura total do objeto maior: {melhor_altura}\n")
     plotar_solucao(melhor_faixas, W, cores)
 
+    end_time = time.time()
+    execution_time = (end_time - start_time) * 1000  # Convertendo para milissegundos
+    arquivo.write(f"Temporizador: {execution_time:.2f} ms\n")
+
 def gerador_de_instancias(n, H, W):
-    itens = [(random.randint(1, H), random.randint(1, W)) for _ in range(n)]
+    itens = [(random.randint(1, H), random.randint(1, int(W/2))) for _ in range(n)]
     return itens
 
 def main():
-    W = 7
+    W = 50
     temp_inicial = 1000
     temp_final = 1
     alfa = 0.9
     iteracoes = 1000
-    n = random.randint(5, 15)
+    n = random.randint(15, 50)
     itens = gerador_de_instancias(n, 10, W - 3)
 
     # Nome do arquivo para armazenar o contador
@@ -236,11 +259,13 @@ def main():
         for item in itens:
             arquivo.write(f"Item: altura = {item[0]}, largura = {item[1]}\n")
         arquivo.write("\n==============================================\n")
-        
+        arquivo.write("\nSolucao Inicial:\n\n")
         faixas, Wdf, cores = solucao_inicial(itens, W, arquivo)
         arquivo.write("\n==============================================\n")
+        arquivo.write("\nSimulated Annealing:\n")
         simulated_annealing(W, faixas, cores, temp_inicial, temp_final, alfa, iteracoes, arquivo)
         arquivo.write("\n==============================================\n")
+        arquivo.write("\nDescida Randomica:\n")
         descida_randomica(W, faixas, cores, iteracoes, arquivo)
 
 main()
