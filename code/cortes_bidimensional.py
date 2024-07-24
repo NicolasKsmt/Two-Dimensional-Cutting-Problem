@@ -210,7 +210,7 @@ def main():
         itens = gerador_de_instancias(n, 10, W - 3)
     elif escolha == '2':
         inputRead = input("Digite qual o numero da instancia: ")
-        itens = ler_itens_de_csv("instancias/instancia_" + inputRead + ".csv")
+        itens = ler_itens_de_csv("../instancias/instancia_" + inputRead + ".csv")
         if not itens:
             print("Nenhum item carregado. Encerrando o programa.")
             return
